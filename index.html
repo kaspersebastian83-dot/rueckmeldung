@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Rückmeldung – Spektron</title>
+<style>
+:root{
+  --bg:#f4f7fb; --panel:#fff; --line:#d6e0ec; --text:#1d2b3a; --muted:#5f7389; --accent:#3f7cc0; --accent-2:#356aa8; --head:#4179b2;
+  --focus:#e6f0fb; --ok:#2e7d4f; --warn:#9a5b00; --err:#c0392b; --chip:#f0f5fb;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#131b24; --panel:#1a2430; --line:#2c3b4d; --text:#e3ebf3; --muted:#93a7bc; --accent:#6fa3dc; --accent-2:#5a93d0; --head:#24476d;
+    --focus:#1f3247; --ok:#6cc08a; --warn:#e2b34f; --err:#f07a70; --chip:#202c3a; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "IBM Plex Sans","Segoe UI",system-ui,Arial,sans-serif}
+header{background:var(--head);color:#fff;padding:10px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+header h1{font-size:17px;margin:0;font-weight:600}
+header .ver{opacity:.75;font-size:12px}
+nav{display:flex;gap:4px;margin-left:auto}
+nav button{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font:inherit}
+nav button[aria-selected=true]{background:#fff;color:var(--accent-2);font-weight:600}
+main{max-width:860px;margin:0 auto;padding:16px}
+main.breit{max-width:1180px}
+.karte{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+h2{font-size:16px;margin:0 0 4px}
+.hinweis{color:var(--muted);font-size:13px;margin:2px 0 8px}
+fieldset{border:0;padding:0;margin:0 0 18px}
+legend,label.l{font-weight:600;padding:0;margin-bottom:6px;display:block}
+.pflicht::after{content:" *";color:var(--err)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
+.chip span{display:block;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--chip);min-width:0}
+.chip small{display:block;color:var(--muted);font-size:12px;line-height:1.3}
+.chip input:checked+span{border-color:var(--accent);background:var(--focus);box-shadow:0 0 0 2px var(--accent) inset}
+.chip input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.chips.gross .chip span{padding:10px 14px}
+input[type=text],textarea,select{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);font:inherit}
+textarea{min-height:84px;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.zeile{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+button.btn{background:var(--accent);border:1px solid var(--accent-2);color:#fff;padding:9px 18px;border-radius:8px;cursor:pointer;font:inherit;font-weight:600}
+button.btn.sek{background:var(--panel);color:var(--accent-2);border-color:var(--line)}
+button.btn:disabled{opacity:.5;cursor:default}
+button.btn:hover:not(:disabled){filter:brightness(1.07)}
+.leiste{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.status{padding:8px 12px;border-radius:8px;font-size:13px;margin-bottom:12px;border:1px solid var(--line);background:var(--chip)}
+.status.ok{border-color:var(--ok)} .status.warn{border-color:var(--warn)} .status.err{border-color:var(--err)}
+.fehler{color:var(--err);font-size:13px;margin-top:4px}
+.bilder{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.bilder figure{margin:0;position:relative}
+.bilder img{height:90px;border:1px solid var(--line);border-radius:6px;display:block}
+.bilder button{position:absolute;top:2px;right:2px;border:0;background:rgba(0,0,0,.65);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer}
+.ablage{border:2px dashed var(--line);border-radius:10px;padding:12px;text-align:center;color:var(--muted)}
+.ablage:focus,.ablage.drag{border-color:var(--accent);background:var(--focus);outline:0}
+.fertig{text-align:center;padding:28px 16px}
+.fertig .gross{font-size:34px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+tbody tr{cursor:pointer} tbody tr:hover,tbody tr.sel{background:var(--focus)}
+.tag{display:inline-block;padding:1px 8px;border-radius:10px;font-size:12px;background:var(--chip);border:1px solid var(--line);white-space:nowrap}
+.tag.blockiert{border-color:var(--err);color:var(--err)}
+.raster{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+@media (max-width:640px){.raster{grid-template-columns:1fr} nav{margin-left:0}}
+.feld b{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.feld pre{white-space:pre-wrap;word-break:break-word;margin:0 0 8px;font:inherit}
+details summary{cursor:pointer;font-weight:600}
+code,.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+[hidden]{display:none!important}
+@media print{header nav,.leiste button{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Spektron · Rückmeldung</h1><span class="ver" id="ver"></span>
+  <nav role="tablist" aria-label="Bereich">
+    <button role="tab" id="tab-form" aria-selected="true" aria-controls="seite-form">Rückmeldung schreiben</button>
+    <button role="tab" id="tab-aus" aria-selected="false" aria-controls="seite-aus">Auswertung (Betreuer)</button>
+  </nav>
+</header>
+<main id="main">
+<!-- ============ FORMULAR ============ -->
+<section id="seite-form" role="tabpanel" aria-labelledby="tab-form">
+  <div class="karte">
+    <h2>Etwas aufgefallen? Schreiben Sie es kurz auf.</h2>
+    <p class="hinweis">Fehler, Komisches, Wünsche oder „Das war unklar“ – alles hilft. Es geht um die Programme, nicht um Sie. Dauert etwa 2 Minuten.<br>
+      <b>Bitte keine Namen von Versicherungsnehmern oder andere Personendaten</b> eintragen – die Projektnummer genügt.</p>
+    <div id="speicherort" class="status" role="status"></div>
+  </div>
+  <form id="form" class="karte" autocomplete="off" novalidate>
+    <fieldset><legend class="pflicht">Welches Programm?</legend><div class="chips" id="c-app"></div><div class="fehler" id="e-app" hidden></div></fieldset>
+    <fieldset><legend class="pflicht">Was ist es?</legend><div class="chips gross" id="c-art"></div><div class="fehler" id="e-art" hidden></div></fieldset>
+    <fieldset><label class="l pflicht" for="f-titel">Worum geht es? (ein Satz)</label>
+      <input type="text" id="f-titel" maxlength="140" placeholder="z. B. „Beim Speichern in LabelKit kommt eine rote Meldung“">
+      <div class="fehler" id="e-titel" hidden></div></fieldset>
+    <fieldset><label class="l" for="f-tat">Was wollten Sie gerade tun?</label>
+      <textarea id="f-tat" placeholder="z. B. „Ich habe Probe 5 erfasst und auf Speichern geklickt.“"></textarea></fieldset>
+    <fieldset><label class="l pflicht" for="f-was">Was ist passiert – oder was stört Sie?</label>
+      <textarea id="f-was" placeholder="So genau wie möglich. Bei Fehlern: Wortlaut der Meldung, wenn eine kam."></textarea>
+      <div class="fehler" id="e-was" hidden></div></fieldset>
+    <fieldset><label class="l" for="f-soll">Wie sollte es stattdessen sein? / Was wünschen Sie sich?</label>
+      <textarea id="f-soll"></textarea></fieldset>
+    <fieldset><legend>Wie sehr stört es?</legend><div class="chips" id="c-dring"></div></fieldset>
+    <fieldset><legend>Wie oft kommt es vor?</legend><div class="chips" id="c-haeuf"></div></fieldset>
+    <fieldset><legend>Bild dazu (hilft sehr)</legend>
+      <div class="ablage" id="ablage" tabindex="0">Screenshot hier mit <b>Strg+V</b> einfügen, hineinziehen oder
+        <button type="button" class="btn sek" id="b-bild">Datei wählen</button>
+        <input type="file" id="f-datei" accept="image/*" multiple hidden></div>
+      <p class="hinweis">Tipp: Windows-Taste + Umschalt + S macht einen Ausschnitt, danach hier Strg+V. Bitte keine Bilder mit Namen von Personen.</p>
+      <div class="bilder" id="bilder"></div></fieldset>
+    <div class="zeile">
+      <fieldset><label class="l pflicht" for="f-kuerzel">Ihr Kürzel</label><input type="text" id="f-kuerzel" maxlength="8" placeholder="z. B. SK">
+        <div class="fehler" id="e-kuerzel" hidden></div></fieldset>
+      <fieldset><label class="l" for="f-projekt">Projekt (falls zutreffend)</label><input type="text" id="f-projekt" maxlength="60" placeholder="z. B. 26.0123 Köln"></fieldset>
+      <fieldset><label class="l" for="f-version">Version des Programms (falls bekannt)</label><input type="text" id="f-version" maxlength="20" placeholder="z. B. 4.30.5">
+        <p class="hinweis">Steht oben in der blauen Leiste; Klick auf die Zahl zeigt Änderungen.</p></fieldset>
+    </div>
+    <div class="leiste"><button type="submit" class="btn" id="b-senden">Rückmeldung abschicken</button><span class="hinweis" id="sende-info"></span></div>
+  </form>
+  <div id="fertig" class="karte fertig" hidden>
+    <div class="gross">✅</div><h2>Danke! Ihre Rückmeldung ist gespeichert.</h2>
+    <p id="fertig-text" class="hinweis"></p>
+    <div class="leiste" style="justify-content:center"><button class="btn" id="b-neu">Weitere Rückmeldung schreiben</button></div>
+  </div>
+</section>
+
+<!-- ============ AUSWERTUNG ============ -->
+<section id="seite-aus" role="tabpanel" aria-labelledby="tab-aus" hidden>
+  <div class="karte">
+    <div class="leiste">
+      <button class="btn" id="a-laden">Rückmeldungen laden</button>
+      <button class="btn sek" id="a-wahl">Speicherort wählen …</button>
+      <span class="hinweis" id="a-info"></span>
+    </div>
+    <div id="a-status" class="status" hidden></div>
+  </div>
+  <div class="karte" id="a-liste-karte" hidden>
+    <div class="zeile" style="margin-bottom:10px">
+      <div><label class="l" for="x-status">Status</label><select id="x-status"></select></div>
+      <div><label class="l" for="x-app">Programm</label><select id="x-app"></select></div>
+      <div><label class="l" for="x-art">Art</label><select id="x-art"></select></div>
+      <div><label class="l" for="x-text">Suche</label><input type="text" id="x-text" placeholder="Stichwort"></div>
+    </div>
+    <div style="overflow-x:auto"><table><thead><tr><th>Datum</th><th>Von</th><th>Programm</th><th>Art</th><th>Titel</th><th>Dringlich</th><th>Status</th></tr></thead><tbody id="a-tbody"></tbody></table></div>
+    <p class="hinweis" id="a-zaehler"></p>
+  </div>
+  <div class="karte" id="a-detail" hidden></div>
+  <div class="karte" id="a-ki" hidden>
+    <h2>Zusammenarbeit mit einer KI</h2>
+    <p class="hinweis">1. „Für KI exportieren“ erzeugt eine Textdatei mit Hintergrund zur Suite, Aufgabe und allen Einträgen – in die KI geben.
+      2. Die KI antwortet mit einem JSON-Block. 3. Diesen unten einfügen und übernehmen: Status, Priorität und Hinweise landen an den Einträgen.</p>
+    <div class="leiste">
+      <button class="btn" id="k-export">Für KI exportieren (.md)</button>
+      <button class="btn sek" id="k-kopie">In Zwischenablage</button>
+      <button class="btn sek" id="k-csv">Als CSV (Excel)</button>
+      <label class="hinweis"><input type="checkbox" id="k-alle"> auch erledigte/abgelehnte</label>
+    </div>
+    <details style="margin-top:12px"><summary>Antwort der KI übernehmen</summary>
+      <textarea id="k-antwort" class="mono" style="min-height:120px;margin-top:8px" placeholder='JSON-Block der KI hier einfügen, z. B. [{"id":"R-20261020-212700-SK","status":"in-arbeit","prioritaet":"hoch","gruppe":"Speichern","hinweis":"…"}]'></textarea>
+      <div class="leiste" style="margin-top:8px"><button class="btn sek" id="k-pruefen">Prüfen</button><button class="btn" id="k-uebernehmen" disabled>Übernehmen</button><span class="hinweis" id="k-info"></span></div>
+    </details>
+  </div>
+</section>
+</main>
+
+<script>
+'use strict';
+/* ===== Konfiguration ===== */
+const APP_VERSION = '1.0.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
+const APPS = [
+  {k:'projektzentrale', t:'Projektzentrale', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Hub: Projekte, Projektdaten, Arbeitszettel einlesen, Anlagen (Word), Absprung in die Apps'},
+  {k:'labelkit',  t:'① LabelKit',  repo:'kaspersebastian83-dot/labelkit',      rolle:'Proben erfassen, Etiketten, Laborübergabe, PN 98, Feldbögen'},
+  {k:'fotokit',   t:'② FotoKit',   repo:'kaspersebastian83-dot/Bildumbenenner', rolle:'Fotos beschreiben/umbenennen, Bilddokumentation (PDF), Ergebnistabelle'},
+  {k:'plankit',   t:'③ PlanKit',   repo:'kaspersebastian83-dot/Probenplan',     rolle:'Probenplan/Grundriss, Ergebniskarte, PDF, Anlage Probenahme (TypeScript/Vite)'},
+  {k:'belegkit',  t:'④ BelegKit',  repo:'kaspersebastian83-dot/aufwandkit',     rolle:'Zeiten, km, Spesen, Proben, Berichtsseiten für die Rechnung'},
+  {k:'spesenkit', t:'SpesenKit',   repo:'kaspersebastian83-dot/reisekosten-pro', rolle:'Monatliche Spesenabrechnung je Person (TypeScript/Vite)'},
+  {k:'suite',     t:'Mehrere Programme / obere Leiste', repo:'', rolle:'Übergreifend (Leiste „Weiter: …“, Wechsel zwischen Apps, Speicherorte)'},
+  {k:'unbekannt', t:'Weiß ich nicht', repo:'', rolle:''}
+];
+const ARTEN = [
+  {k:'fehler', i:'🐞', t:'Fehler', h:'Etwas geht nicht oder das Ergebnis ist falsch'},
+  {k:'auffaellig', i:'👀', t:'Auffälligkeit', h:'Komisch, aber es geht'},
+  {k:'wunsch', i:'💡', t:'Verbesserungswunsch', h:'Das könnte einfacher oder schneller gehen'},
+  {k:'frage', i:'❓', t:'Unklar / Frage', h:'Ich weiß nicht, wie das gedacht ist'},
+  {k:'lob', i:'👍', t:'Hat gut geklappt', h:'Bitte so lassen'}
+];
+const DRING = [{k:'blockiert', t:'Ich komme nicht weiter'}, {k:'stoert', t:'Stört, geht aber mit Umweg'}, {k:'klein', t:'Kleinigkeit'}, {k:'idee', t:'Nur ein Gedanke'}];
+const HAEUF = [{k:'einmal', t:'Einmal'}, {k:'manchmal', t:'Manchmal'}, {k:'immer', t:'Jedes Mal'}];
+const STATI = [{k:'neu', t:'Neu'}, {k:'rueckfrage', t:'Rückfrage an Mitarbeiter'}, {k:'in-arbeit', t:'In Arbeit'}, {k:'erledigt', t:'Erledigt'}, {k:'abgelehnt', t:'Wird nicht umgesetzt'}];
+const OFFEN = ['neu', 'rueckfrage', 'in-arbeit'], PRIOS = ['hoch', 'mittel', 'niedrig'];
+const lab = (liste, k) => (liste.find(x => x.k === k) || {}).t || k || '–';
+
+/* ===== Helfer ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const pad = n => String(n).padStart(2, '0');
+const stempel = d => `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+const isoLokal = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const deDatum = iso => { const m = /^(\d{4})-(\d{2})-(\d{2})T?(\d{2}:\d{2})?/.exec(iso || ''); return m ? `${m[3]}.${m[2]}.${m[1]}${m[4] ? ' ' + m[4] : ''}` : (iso || ''); };
+const slug = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 24) || 'x';
+const ls = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }, del(k) { try { localStorage.removeItem(k); } catch (e) {} } };
+
+function chips(host, name, liste, mitHinweis) {
+  host.innerHTML = liste.map(x => `<label class="chip"><input type="radio" name="${name}" value="${esc(x.k)}"><span>${x.i ? esc(x.i) + ' ' : ''}<b>${esc(x.t)}</b>${mitHinweis && x.h ? '<small>' + esc(x.h) + '</small>' : ''}</span></label>`).join('');
+}
+const gewaehlt = name => { const r = document.querySelector(`input[name="${name}"]:checked`); return r ? r.value : ''; };
+
+/* ===== Speicherort: Ordner-Handles im Browser-Speicher ===== */
+function idb(name) {
+  return new Promise((res, rej) => {
+    const r = indexedDB.open(name, 1);
+    r.onupgradeneeded = () => { if (!r.result.objectStoreNames.contains('kv')) r.result.createObjectStore('kv'); };
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+const kvGet = (db, k) => new Promise((res, rej) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+const kvSet = (db, k, v) => new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); });
+async function recht(h, anfragen) {
+  if (!h.queryPermission) return true;
+  if ((await h.queryPermission({mode: 'readwrite'})) === 'granted') return true;
+  return !!(anfragen && h.requestPermission && (await h.requestPermission({mode: 'readwrite'})) === 'granted');
+}
+/* Reihenfolge: 1. selbst gewählter Ordner, 2. Archivordner der Projektzentrale › „_Rückmeldungen“ (gleiche Webadresse), sonst kein Ordner. */
+async function ordnerAufloesen(anfragen) {
+  try {
+    const h = await kvGet(await idb('rueckmeldung'), 'ordner');
+    if (h) return (await recht(h, anfragen)) ? {dir: h, quelle: `Ordner „${h.name}“`} : {fehlt: 'recht', quelle: `Ordner „${h.name}“`};
+  } catch (e) {}
+  try {
+    const a = await kvGet(await idb('mosaik-suite'), 'archiv');
+    if (a) {
+      if (!(await recht(a, anfragen))) return {fehlt: 'recht', quelle: 'Archivordner › _Rückmeldungen'};
+      return {dir: await a.getDirectoryHandle('_Rückmeldungen', {create: true}), quelle: 'Archivordner › _Rückmeldungen'};
+    }
+  } catch (e) {}
+  return {fehlt: 'ordner'};
+}
+async function ordnerWaehlen() {
+  if (!window.showDirectoryPicker) { alert('Dieser Browser kann keinen Ordner wählen. Bitte Chrome oder Edge verwenden.'); return false; }
+  let h; try { h = await window.showDirectoryPicker({mode: 'readwrite'}); } catch (e) { return false; }
+  await kvSet(await idb('rueckmeldung'), 'ordner', h); return true;
+}
+
+/* ===== Datei-Helfer ===== */
+async function existiert(dir, name) { try { await dir.getFileHandle(name); return true; } catch (e) { return false; } }
+async function schreibe(dir, name, inhalt) { const fh = await dir.getFileHandle(name, {create: true}); const w = await fh.createWritable(); await w.write(inhalt); await w.close(); }
+function herunterladen(name, blob) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* ===== Formular ===== */
+const bilder = [];   // {blob, ext, url}
+function formInit() {
+  $('#ver').textContent = 'Version ' + APP_VERSION;
+  chips($('#c-app'), 'app', APPS, false); chips($('#c-art'), 'art', ARTEN, true);
+  chips($('#c-dring'), 'dring', DRING, false); chips($('#c-haeuf'), 'haeuf', HAEUF, false);
+  $('#f-kuerzel').value = ls.get('rueckmeldung:kuerzel') || '';
+  try { const e = JSON.parse(ls.get('rueckmeldung:entwurf') || 'null'); if (e) entwurfLaden(e); } catch (x) {}
+  document.querySelectorAll('#form input, #form textarea').forEach(el => el.addEventListener('input', () => { clearTimeout(formInit.t); formInit.t = setTimeout(entwurfSpeichern, 400); }));
+  $('#f-kuerzel').addEventListener('input', () => ls.set('rueckmeldung:kuerzel', $('#f-kuerzel').value.trim().toUpperCase()));
+  window.addEventListener('pagehide', entwurfSpeichern);   // Tab schließen/neu laden verliert nichts
+  document.addEventListener('visibilitychange', () => { if (document.hidden) entwurfSpeichern(); });
+  $('#form').addEventListener('submit', e => { e.preventDefault(); senden(); });
+  $('#b-neu').onclick = () => { $('#fertig').hidden = true; $('#form').hidden = false; $('#f-titel').focus(); window.scrollTo(0, 0); };
+  $('#b-bild').onclick = () => $('#f-datei').click();
+  $('#f-datei').onchange = e => { bilderHinzu([...e.target.files]); e.target.value = ''; };
+  const ab = $('#ablage');
+  ab.addEventListener('dragover', e => { e.preventDefault(); ab.classList.add('drag'); });
+  ab.addEventListener('dragleave', () => ab.classList.remove('drag'));
+  ab.addEventListener('drop', e => { e.preventDefault(); ab.classList.remove('drag'); bilderHinzu([...e.dataTransfer.files]); });
+  document.addEventListener('paste', e => {
+    if ($('#seite-form').hidden || $('#form').hidden) return;
+    const f = [...(e.clipboardData ? e.clipboardData.files : [])].filter(x => x.type.startsWith('image/'));
+    if (f.length) { e.preventDefault(); bilderHinzu(f); }
+  });
+}
+function entwurfSpeichern() {
+  const e = {app: gewaehlt('app'), art: gewaehlt('art'), dring: gewaehlt('dring'), haeuf: gewaehlt('haeuf'),
+    titel: $('#f-titel').value, tat: $('#f-tat').value, was: $('#f-was').value, soll: $('#f-soll').value, projekt: $('#f-projekt').value, version: $('#f-version').value};
+  if (Object.values(e).some(v => v)) ls.set('rueckmeldung:entwurf', JSON.stringify(e)); else ls.del('rueckmeldung:entwurf');
+}
+function entwurfLaden(e) {
+  for (const n of ['app', 'art', 'dring', 'haeuf']) { const r = document.querySelector(`input[name="${n}"][value="${e[n]}"]`); if (r) r.checked = true; }
+  $('#f-titel').value = e.titel || ''; $('#f-tat').value = e.tat || ''; $('#f-was').value = e.was || ''; $('#f-soll').value = e.soll || '';
+  $('#f-projekt').value = e.projekt || ''; $('#f-version').value = e.version || '';
+}
+/* Bilder auf höchstens 1800 px Breite verkleinern (Prüfsumme/Original ist hier nicht nötig) */
+async function bildAufbereiten(file) {
+  const bmp = await createImageBitmap(file);
+  const f = Math.min(1, 1800 / bmp.width), c = document.createElement('canvas');
+  c.width = Math.round(bmp.width * f); c.height = Math.round(bmp.height * f);
+  c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+  let blob = await new Promise(r => c.toBlob(r, 'image/png')), ext = 'png';
+  if (blob && blob.size > 2.5e6) { blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .85)); ext = 'jpg'; }
+  return {blob, ext};
+}
+async function bilderHinzu(dateien) {
+  for (const f of dateien) {
+    if (!f.type.startsWith('image/')) continue;
+    if (bilder.length >= 3) { alert('Es sind höchstens 3 Bilder je Rückmeldung möglich.'); break; }
+    try { const b = await bildAufbereiten(f); b.url = URL.createObjectURL(b.blob); bilder.push(b); }
+    catch (e) { alert('Dieses Bild konnte nicht gelesen werden (HEIC-Fotos kann Chrome nicht öffnen).'); }
+  }
+  bilderZeigen();
+}
+function bilderZeigen() {
+  $('#bilder').innerHTML = bilder.map((b, i) => `<figure><img src="${b.url}" alt="Bild ${i + 1}"><button type="button" data-i="${i}" aria-label="Bild ${i + 1} entfernen">×</button></figure>`).join('');
+  $('#bilder').querySelectorAll('button').forEach(bt => bt.onclick = () => { URL.revokeObjectURL(bilder[+bt.dataset.i].url); bilder.splice(+bt.dataset.i, 1); bilderZeigen(); });
+}
+function fehler(id, text) { const el = $('#' + id); el.hidden = !text; el.textContent = text || ''; return !!text; }
+function pruefen() {
+  let bad = [];
+  if (fehler('e-app', gewaehlt('app') ? '' : 'Bitte ein Programm wählen.')) bad.push('#c-app input');
+  if (fehler('e-art', gewaehlt('art') ? '' : 'Bitte wählen, was es ist.')) bad.push('#c-art input');
+  if (fehler('e-titel', $('#f-titel').value.trim() ? '' : 'Bitte in einem Satz sagen, worum es geht.')) bad.push('#f-titel');
+  if (fehler('e-was', $('#f-was').value.trim() ? '' : 'Bitte kurz beschreiben, was passiert ist oder was stört.')) bad.push('#f-was');
+  if (fehler('e-kuerzel', $('#f-kuerzel').value.trim() ? '' : 'Bitte Ihr Kürzel eintragen, damit wir nachfragen können.')) bad.push('#f-kuerzel');
+  if (bad.length) { const el = document.querySelector(bad[0]); el.focus(); el.scrollIntoView({block: 'center'}); }
+  return !bad.length;
+}
+function eintragBauen(id, bildNamen) {
+  const kuerzel = $('#f-kuerzel').value.trim().toUpperCase();
+  return {
+    format: FORMAT, version: FORMAT_VERSION, id, erstellt: isoLokal(new Date()), von: kuerzel,
+    app: gewaehlt('app'), art: gewaehlt('art'), dringlichkeit: gewaehlt('dring'), haeufigkeit: gewaehlt('haeuf'),
+    titel: $('#f-titel').value.trim(), was_getan: $('#f-tat').value.trim(), was_passiert: $('#f-was').value.trim(), erwartet_oder_wunsch: $('#f-soll').value.trim(),
+    projekt: $('#f-projekt').value.trim(), app_version: $('#f-version').value.trim(), bilder: bildNamen,
+    umgebung: {browser: navigator.userAgent.replace(/^Mozilla\/5\.0 /, '').slice(0, 140), fenster: `${innerWidth}x${innerHeight}`, formular: APP_VERSION},
+    bearbeitung: {status: 'neu', prioritaet: '', gruppe: '', notiz: '', ki_hinweis: '', geaendert: ''}
+  };
+}
+async function senden() {
+  if (!pruefen()) return;
+  const btn = $('#b-senden'); btn.disabled = true; $('#sende-info').textContent = 'Speichere …';
+  ls.set('rueckmeldung:kuerzel', $('#f-kuerzel').value.trim().toUpperCase());
+  const jetzt = new Date(), kuerzel = $('#f-kuerzel').value.trim().toUpperCase();
+  let id = `R-${stempel(jetzt)}-${slug(kuerzel)}`;
+  try {
+    const o = await ordnerAufloesen(true);
+    if (!o.dir) throw Object.assign(new Error('kein Ordner'), {keinOrdner: true});
+    for (let n = 2; await existiert(o.dir, `${id}.json`); n++) id = `R-${stempel(jetzt)}-${slug(kuerzel)}-${n}`;
+    const namen = [];
+    for (let i = 0; i < bilder.length; i++) { const n = `${id}_bild${i + 1}.${bilder[i].ext}`; await schreibe(o.dir, n, bilder[i].blob); namen.push(n); }
+    await schreibe(o.dir, `${id}.json`, JSON.stringify(eintragBauen(id, namen), null, 2));
+    fertig(id, `Gespeichert in: ${o.quelle}.`);
+  } catch (e) {
+    /* Nie verlieren: als Datei herunterladen, falls kein Ordner da ist oder das Schreiben scheitert */
+    const namen = bilder.map((b, i) => `${id}_bild${i + 1}.${b.ext}`);
+    herunterladen(`${id}.json`, new Blob([JSON.stringify(eintragBauen(id, namen), null, 2)], {type: 'application/json'}));
+    bilder.forEach((b, i) => herunterladen(namen[i], b.blob));
+    fertig(id, e.keinOrdner ? 'Es ist noch kein Speicherort eingerichtet. Die Rückmeldung wurde als Datei heruntergeladen – bitte die Datei(en) im Ordner „Downloads“ an den Betreuer geben.'
+      : 'Der Speicherort war nicht erreichbar (' + (e.message || e) + '). Die Rückmeldung wurde stattdessen als Datei heruntergeladen – bitte an den Betreuer geben.');
+  }
+  btn.disabled = false; $('#sende-info').textContent = '';
+}
+function fertig(id, text) {
+  ls.del('rueckmeldung:entwurf');
+  $('#form').reset(); $('#f-kuerzel').value = ls.get('rueckmeldung:kuerzel') || '';
+  bilder.splice(0).forEach(b => URL.revokeObjectURL(b.url)); bilderZeigen();
+  $('#form').hidden = true; $('#fertig').hidden = false;
+  $('#fertig-text').textContent = `Nummer: ${id}. ${text}`;
+  window.scrollTo(0, 0); $('#b-neu').focus();
+}
+async function speicherortAnzeigen() {
+  const el = $('#speicherort'), o = await ordnerAufloesen(false);
+  el.className = 'status';
+  if (o.dir) { el.classList.add('ok'); el.innerHTML = `✓ Ihre Rückmeldung wird gespeichert in: <b>${esc(o.quelle)}</b>`; }
+  else if (o.fehlt === 'recht') { el.classList.add('warn'); el.innerHTML = `Zum Speichern braucht der Browser kurz Ihre Erlaubnis (${esc(o.quelle)}). Das passiert beim Abschicken automatisch – bitte dann „Zugriff erlauben“ klicken.`; }
+  else { el.classList.add('warn'); el.innerHTML = 'Noch kein Speicherort eingerichtet – die Rückmeldung wird beim Abschicken <b>als Datei heruntergeladen</b>. <button type="button" class="btn sek" id="s-wahl">Ordner wählen …</button>';
+    const b = $('#s-wahl'); if (b) b.onclick = async () => { if (await ordnerWaehlen()) speicherortAnzeigen(); }; }
+}
+
+/* ===== Auswertung ===== */
+let alle = [], gewaehlteId = null, kiPlan = null;
+async function ordnerFuerAuswertung() {
+  const o = await ordnerAufloesen(true);
+  if (o.dir) return o;
+  if (o.fehlt === 'ordner' && await ordnerWaehlen()) return ordnerAufloesen(true);
+  return o;
+}
+function aStatus(text, art) { const el = $('#a-status'); el.hidden = !text; el.className = 'status ' + (art || ''); el.textContent = text || ''; }
+async function laden() {
+  aStatus('Lade …');
+  const o = await ordnerFuerAuswertung();
+  if (!o.dir) { aStatus('Kein Zugriff auf den Speicherort. Bitte „Speicherort wählen …“ klicken.', 'warn'); return; }
+  const liste = [], kaputt = [];
+  for await (const [name, h] of o.dir.entries()) {
+    if (h.kind !== 'file' || !/\.json$/i.test(name)) continue;
+    try { const e = JSON.parse(await (await h.getFile()).text()); if (e && e.format === FORMAT) { e._datei = name; e.bearbeitung = Object.assign({status: 'neu', prioritaet: '', gruppe: '', notiz: '', ki_hinweis: '', geaendert: ''}, e.bearbeitung || {}); liste.push(e); } }
+    catch (x) { kaputt.push(name); }
+  }
+  liste.sort((a, b) => String(b.erstellt).localeCompare(String(a.erstellt)));
+  alle = liste; o.dirHandle = o.dir; window.__dir = o.dir;
+  $('#a-info').textContent = `Quelle: ${o.quelle}`;
+  aStatus(kaputt.length ? `${kaputt.length} Datei(en) konnten nicht gelesen werden: ${kaputt.slice(0, 5).join(', ')}` : '', kaputt.length ? 'warn' : '');
+  $('#a-liste-karte').hidden = false; $('#a-ki').hidden = false;
+  tabelle();
+}
+function gefiltert() {
+  const s = $('#x-status').value, a = $('#x-app').value, r = $('#x-art').value, t = $('#x-text').value.trim().toLowerCase();
+  return alle.filter(e => (s === 'offen' ? OFFEN.includes(e.bearbeitung.status) : !s || e.bearbeitung.status === s) && (!a || e.app === a) && (!r || e.art === r) &&
+    (!t || [e.titel, e.was_passiert, e.was_getan, e.erwartet_oder_wunsch, e.von, e.projekt, e.id].join(' ').toLowerCase().includes(t)));
+}
+function tabelle() {
+  const f = gefiltert();
+  $('#a-tbody').innerHTML = f.map(e => `<tr data-id="${esc(e.id)}" class="${e.id === gewaehlteId ? 'sel' : ''}" tabindex="0">
+    <td>${esc(deDatum(e.erstellt))}</td><td>${esc(e.von)}</td><td>${esc(lab(APPS, e.app))}</td><td>${esc(lab(ARTEN, e.art))}</td>
+    <td>${esc(e.titel)}</td><td><span class="tag ${esc(e.dringlichkeit)}">${esc(e.dringlichkeit ? lab(DRING, e.dringlichkeit) : '–')}</span></td>
+    <td><span class="tag">${esc(lab(STATI, e.bearbeitung.status))}</span></td></tr>`).join('') || '<tr><td colspan="7" class="hinweis">Keine Einträge für diese Auswahl.</td></tr>';
+  $('#a-zaehler').textContent = `${f.length} von ${alle.length} Einträgen · ${alle.filter(e => OFFEN.includes(e.bearbeitung.status)).length} offen`;
+  $('#a-tbody').querySelectorAll('tr[data-id]').forEach(tr => { tr.onclick = () => detail(tr.dataset.id); tr.onkeydown = ev => { if (ev.key === 'Enter') detail(tr.dataset.id); }; });
+}
+function feld(titel, text) { return text ? `<div class="feld"><b>${esc(titel)}</b><pre>${esc(text)}</pre></div>` : ''; }
+async function detail(id) {
+  gewaehlteId = id; tabelle();
+  const e = alle.find(x => x.id === id); if (!e) return;
+  const d = $('#a-detail'); d.hidden = false;
+  const b = e.bearbeitung;
+  d.innerHTML = `<h2>${esc(e.titel)}</h2><p class="hinweis mono">${esc(e.id)} · ${esc(deDatum(e.erstellt))} · von ${esc(e.von)}</p>
+    <div class="raster">${feld('Programm', lab(APPS, e.app) + (e.app_version ? ' (Version ' + e.app_version + ')' : ''))}${feld('Art', lab(ARTEN, e.art))}
+    ${feld('Dringlichkeit', e.dringlichkeit ? lab(DRING, e.dringlichkeit) : '')}${feld('Häufigkeit', e.haeufigkeit ? lab(HAEUF, e.haeufigkeit) : '')}${feld('Projekt', e.projekt)}</div>
+    ${feld('Was wollte die Person tun?', e.was_getan)}${feld('Was ist passiert / was stört?', e.was_passiert)}${feld('Erwartet / Wunsch', e.erwartet_oder_wunsch)}
+    <div class="bilder" id="d-bilder"></div>
+    ${b.ki_hinweis ? feld('Hinweis der KI', b.ki_hinweis) : ''}
+    <hr style="border:0;border-top:1px solid var(--line);margin:12px 0">
+    <div class="zeile">
+      <div><label class="l" for="d-status">Status</label><select id="d-status">${STATI.map(s => `<option value="${s.k}"${s.k === b.status ? ' selected' : ''}>${esc(s.t)}</option>`).join('')}</select></div>
+      <div><label class="l" for="d-prio">Priorität</label><select id="d-prio"><option value="">–</option>${PRIOS.map(p => `<option${p === b.prioritaet ? ' selected' : ''}>${p}</option>`).join('')}</select></div>
+      <div><label class="l" for="d-gruppe">Gruppe / Thema</label><input type="text" id="d-gruppe" value="${esc(b.gruppe)}"></div>
+    </div>
+    <label class="l" for="d-notiz" style="margin-top:10px">Notiz (intern; bei „Rückfrage“ die Frage an die Person)</label><textarea id="d-notiz">${esc(b.notiz)}</textarea>
+    <div class="leiste" style="margin-top:10px"><button class="btn" id="d-speichern">Speichern</button><span class="hinweis" id="d-info"></span></div>`;
+  $('#d-speichern').onclick = async () => {
+    try { await aendern(e._datei, ex => Object.assign(ex.bearbeitung, {status: $('#d-status').value, prioritaet: $('#d-prio').value, gruppe: $('#d-gruppe').value.trim(), notiz: $('#d-notiz').value.trim()}));
+      $('#d-info').textContent = 'Gespeichert.'; await laden(); gewaehlteId = id; tabelle(); }
+    catch (x) { $('#d-info').textContent = 'Fehler beim Speichern: ' + x.message; }
+  };
+  const host = $('#d-bilder');
+  for (const n of e.bilder || []) { try { const f = await (await window.__dir.getFileHandle(n)).getFile(); const im = document.createElement('img'); im.src = URL.createObjectURL(f); im.alt = n; im.title = n; im.style.height = '140px'; host.appendChild(im); } catch (x) {} }
+}
+/* Frisch lesen → nur „bearbeitung“ ändern → schreiben (Angaben der Mitarbeiter bleiben unberührt) */
+async function aendern(datei, fn) {
+  const fh = await window.__dir.getFileHandle(datei), ex = JSON.parse(await (await fh.getFile()).text());
+  ex.bearbeitung = Object.assign({status: 'neu', prioritaet: '', gruppe: '', notiz: '', ki_hinweis: ''}, ex.bearbeitung || {});
+  fn(ex); ex.bearbeitung.geaendert = isoLokal(new Date());
+  const w = await fh.createWritable(); await w.write(JSON.stringify(ex, null, 2)); await w.close();
+}
+
+/* ===== KI-Export / -Import / CSV ===== */
+const zitat = t => String(t || '').split('\n').map(l => '> ' + l).join('\n');
+function kiMarkdown(liste) {
+  const apps = APPS.filter(a => a.repo).map(a => `| ${a.t} | \`${a.repo}\` | ${a.rolle} |`).join('\n');
+  const eintraege = liste.map(e => {
+    const b = e.bearbeitung, app = APPS.find(a => a.k === e.app) || {};
+    return `### ${e.id} – ${e.titel}
+- Programm: ${lab(APPS, e.app)}${app.repo ? ' (Repo: ' + app.repo + ')' : ''}${e.app_version ? ', Version ' + e.app_version : ''}
+- Art: ${lab(ARTEN, e.art)} · Dringlichkeit: ${e.dringlichkeit ? lab(DRING, e.dringlichkeit) : 'nicht angegeben'} · Häufigkeit: ${e.haeufigkeit ? lab(HAEUF, e.haeufigkeit) : 'nicht angegeben'}
+- Von: ${e.von} am ${deDatum(e.erstellt)}${e.projekt ? ' · Projekt: ' + e.projekt : ''}
+- Status: ${lab(STATI, b.status)}${b.prioritaet ? ' · Priorität: ' + b.prioritaet : ''}${b.gruppe ? ' · Gruppe: ' + b.gruppe : ''}
+${e.was_getan ? '- Was die Person tun wollte:\n' + zitat(e.was_getan) + '\n' : ''}- Was passiert ist / was stört:\n${zitat(e.was_passiert)}
+${e.erwartet_oder_wunsch ? '- Erwartung / Wunsch:\n' + zitat(e.erwartet_oder_wunsch) + '\n' : ''}${(e.bilder || []).length ? '- Bilder (separate Dateien): ' + e.bilder.join(', ') + '\n' : ''}${b.notiz ? '- Notiz des Betreuers: ' + b.notiz + '\n' : ''}`;
+  }).join('\n');
+  return `# Rückmeldungen zur Spektron-Suite – Übergabe an eine KI
+Erzeugt am ${deDatum(isoLokal(new Date()))} mit Rückmeldung ${APP_VERSION}. Einträge: ${liste.length}.
+
+## Hintergrund (bitte zuerst lesen)
+Spektron ist eine Suite kleiner **Offline-Web-Apps** für ein Sachverständigenbüro für Brandschaden-Chemie (Proben, Fotos, Pläne, Abrechnung für Gutachten). Alle Apps laufen nur im Browser (Chrome/Edge) auf einem Büro-Terminal (RDP), arbeiten direkt auf Projektordnern (File System Access API) und laden nichts hoch (CSP \`connect-src 'self'\`). Es gibt keinen Server. Mitarbeiter arbeiten vor Ort nur auf Papier; die Apps sind vor allem Schreibtisch-Werkzeuge. Die Nutzer sind teils wenig technikaffin und schnell überfordert – einfache, geführte Bedienung hat Vorrang vor Funktionsfülle.
+
+Arbeitsablauf pro Projekt: Projektzentrale (Projektdaten, Arbeitszettel) → ① LabelKit → ② FotoKit → ③ PlanKit → ④ BelegKit; SpesenKit läuft getrennt davon.
+
+| Programm | Repository (GitHub) | Aufgabe |
+|---|---|---|
+${apps}
+
+Randbedingungen für jeden Vorschlag: Datenformate (\`_Projekt.json\`, \`.probenplan\`, \`_Bildumbenenner.json\`, …) und Dateinamen nicht brechen; nichts darf Daten still überschreiben oder löschen; Warnungen statt stiller Annahmen; keine externen Dienste. Die Anzeigenamen der Apps weichen teils von den Repository-Namen ab (siehe Tabelle).
+
+## Aufgabe
+1. **Duplikate und Zusammenhänge** erkennen; Einträge zu Gruppen (Themen) bündeln.
+2. Jede Gruppe **priorisieren** (hoch/mittel/niedrig) nach Wirkung (blockiert Arbeit? wie oft? wie viele Personen?) und Aufwand; **Quick Wins** gesondert nennen.
+3. Pro Gruppe: vermuteter Ort (Programm/Repo/Bereich), mögliche Ursache bzw. Lösungsidee, und was **fehlt**, um sicher zu sein.
+4. **Nichts erfinden.** Wenn Angaben fehlen, formuliere eine kurze, freundliche **Rückfrage an die Person** (Status \`rueckfrage\`).
+5. Fehler zuerst, dann Auffälligkeiten, dann Wünsche. „Hat gut geklappt“-Einträge nur als Hinweis, was erhalten bleiben soll.
+
+## Antwortformat
+A) Eine kurze Übersicht in Markdown (Gruppen, Priorität, Quick Wins, Rückfragen).
+B) Danach **genau ein JSON-Block** (Array), der in das Auswertungswerkzeug übernommen wird. Erlaubte Felder je Eintrag: \`id\` (Pflicht, exakt wie unten), \`status\` (\`neu\` | \`rueckfrage\` | \`in-arbeit\` | \`erledigt\` | \`abgelehnt\`), \`prioritaet\` (\`hoch\` | \`mittel\` | \`niedrig\`), \`gruppe\` (kurzes Thema), \`hinweis\` (1–3 Sätze: Ursache/Lösungsidee oder die Rückfrage an die Person). Nicht genannte Felder bleiben unverändert.
+\`\`\`json
+[{"id":"R-20261020-212700-SK","status":"in-arbeit","prioritaet":"hoch","gruppe":"Speichern","hinweis":"Vermutlich …"}]
+\`\`\`
+
+## Einträge
+${eintraege || '(keine)'}
+`;
+}
+function kiListe() { const alleDabei = $('#k-alle').checked; return alle.filter(e => alleDabei || OFFEN.includes(e.bearbeitung.status)); }
+function kiAntwortLesen(text) {
+  const a = text.indexOf('['), z = text.lastIndexOf(']');
+  if (a < 0 || z < a) throw new Error('Kein JSON-Array gefunden.');
+  const arr = JSON.parse(text.slice(a, z + 1));
+  if (!Array.isArray(arr)) throw new Error('Das ist kein Array.');
+  return arr;
+}
+function csv(liste) {
+  const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""').replace(/\r?\n/g, ' ') + '"';
+  const kopf = ['ID', 'Datum', 'Von', 'Programm', 'Version', 'Art', 'Dringlichkeit', 'Häufigkeit', 'Projekt', 'Titel', 'Was getan', 'Was passiert', 'Erwartung/Wunsch', 'Status', 'Priorität', 'Gruppe', 'Notiz', 'KI-Hinweis'];
+  const z = liste.map(e => [e.id, deDatum(e.erstellt), e.von, lab(APPS, e.app), e.app_version, lab(ARTEN, e.art), e.dringlichkeit ? lab(DRING, e.dringlichkeit) : '', e.haeufigkeit ? lab(HAEUF, e.haeufigkeit) : '', e.projekt, e.titel,
+    e.was_getan, e.was_passiert, e.erwartet_oder_wunsch, lab(STATI, e.bearbeitung.status), e.bearbeitung.prioritaet, e.bearbeitung.gruppe, e.bearbeitung.notiz, e.bearbeitung.ki_hinweis].map(q).join(';'));
+  return '﻿' + [kopf.map(q).join(';'), ...z].join('\r\n');
+}
+function auswertungInit() {
+  const fuell = (id, erste, liste) => { $(id).innerHTML = `<option value="">${erste}</option>` + liste.map(x => `<option value="${x.k}">${esc(x.t)}</option>`).join(''); };
+  $('#x-status').innerHTML = '<option value="offen">Offen (neu, Rückfrage, in Arbeit)</option><option value="">Alle</option>' + STATI.map(s => `<option value="${s.k}">${esc(s.t)}</option>`).join('');
+  fuell('#x-app', 'Alle', APPS); fuell('#x-art', 'Alle', ARTEN);
+  for (const id of ['#x-status', '#x-app', '#x-art']) $(id).onchange = tabelle;
+  $('#x-text').oninput = tabelle;
+  $('#a-laden').onclick = laden;
+  $('#a-wahl').onclick = async () => { if (await ordnerWaehlen()) laden(); };
+  $('#k-export').onclick = () => herunterladen(`Rueckmeldungen_KI_${stempel(new Date())}.md`, new Blob([kiMarkdown(kiListe())], {type: 'text/markdown;charset=utf-8'}));
+  $('#k-kopie').onclick = async () => { try { await navigator.clipboard.writeText(kiMarkdown(kiListe())); $('#k-info').textContent = 'In die Zwischenablage kopiert.'; } catch (e) { $('#k-info').textContent = 'Kopieren nicht möglich – bitte die Datei exportieren.'; } };
+  $('#k-csv').onclick = () => herunterladen(`Rueckmeldungen_${stempel(new Date())}.csv`, new Blob([csv(gefiltert())], {type: 'text/csv;charset=utf-8'}));
+  $('#k-pruefen').onclick = () => {
+    kiPlan = null; $('#k-uebernehmen').disabled = true;
+    try {
+      const arr = kiAntwortLesen($('#k-antwort').value), ok = [], bad = [];
+      for (const r of arr) {
+        const e = r && alle.find(x => x.id === r.id);
+        if (!e) { bad.push(`${r && r.id}: unbekannte ID`); continue; }
+        if (r.status && !STATI.some(s => s.k === r.status)) { bad.push(`${r.id}: ungültiger Status „${r.status}“`); continue; }
+        if (r.prioritaet && !PRIOS.includes(r.prioritaet)) { bad.push(`${r.id}: ungültige Priorität „${r.prioritaet}“`); continue; }
+        ok.push(r);
+      }
+      kiPlan = ok; $('#k-uebernehmen').disabled = !ok.length;
+      $('#k-info').textContent = `${ok.length} Eintrag/Einträge bereit${bad.length ? ' · übersprungen: ' + bad.join('; ') : ''}.`;
+    } catch (e) { $('#k-info').textContent = 'Fehler: ' + e.message; }
+  };
+  $('#k-uebernehmen').onclick = async () => {
+    if (!kiPlan) return; let n = 0;
+    try {
+      for (const r of kiPlan) {
+        const e = alle.find(x => x.id === r.id);
+        await aendern(e._datei, ex => { const b = ex.bearbeitung; if (r.status) b.status = r.status; if (r.prioritaet) b.prioritaet = r.prioritaet;
+          if (typeof r.gruppe === 'string') b.gruppe = r.gruppe.slice(0, 80); if (typeof r.hinweis === 'string') b.ki_hinweis = r.hinweis.slice(0, 1000); });
+        n++;
+      }
+      $('#k-info').textContent = `${n} Eintrag/Einträge aktualisiert.`; kiPlan = null; $('#k-uebernehmen').disabled = true; await laden();
+    } catch (e) { $('#k-info').textContent = `Fehler nach ${n} Einträgen: ${e.message}`; }
+  };
+}
+
+/* ===== Reiter ===== */
+function reiter(welcher) {
+  const aus = welcher === 'aus';
+  $('#seite-form').hidden = aus; $('#seite-aus').hidden = !aus; $('#main').classList.toggle('breit', aus);
+  $('#tab-form').setAttribute('aria-selected', String(!aus)); $('#tab-aus').setAttribute('aria-selected', String(aus));
+}
+$('#tab-form').onclick = () => reiter('form'); $('#tab-aus').onclick = () => reiter('aus');
+formInit(); auswertungInit(); speicherortAnzeigen();
+if (location.hash === '#auswertung') reiter('aus');
+</script>
+</body>
+</html>
