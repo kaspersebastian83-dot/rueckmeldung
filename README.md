@@ -13,7 +13,7 @@ Die App läuft vollständig im Browser. **Rückmeldungen und Bilder werden nicht
 
 ## Für Mitarbeiter („Rückmeldung schreiben“)
 
-Verlinkt aus der Projektzentrale („Weitere Apps“), dem Handbuch und SpesenKit. Die Apps übergeben, was sie wissen: `…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123` belegt Programm, Version und Projekt vor (nur leere Felder; ein gespeicherter Entwurf geht vor; unbekannte Programme werden ignoriert). Programme: `projektzentrale`, `labelkit`, `fotokit`, `plankit`, `belegkit`, `spesenkit`, `datenarchiv`, `buero`, `handbuch`, `suite`, `unbekannt`.
+Verlinkt aus der Projektzentrale („Weitere Apps“), dem Handbuch und SpesenKit. Die Apps übergeben, was sie wissen: `…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123` belegt Programm, Version und Projekt vor (nur leere Felder; ein gespeicherter Entwurf geht vor; unbekannte Programme werden ignoriert). Programme: `projektzentrale`, `labelkit`, `fotokit`, `resultkit`, `plankit`, `belegkit`, `spesenkit`, `datenarchiv`, `buero`, `handbuch`, `suite`, `unbekannt`.
 
 1. Programm wählen, dann „Was ist es?“ (Fehler / Auffälligkeit / Verbesserungswunsch / Unklar / Hat gut geklappt).
 2. Ein Satz, worum es geht, und was passiert ist oder stört. Optional: was man tun wollte, was man erwartet hat, wie sehr es stört, wie oft, Projekt, Version.

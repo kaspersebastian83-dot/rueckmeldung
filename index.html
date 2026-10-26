@@ -475,7 +475,7 @@ Erzeugt am ${deDatum(isoLokal(new Date()))} mit Rückmeldung ${APP_VERSION}. Ein
 ## Hintergrund (bitte zuerst lesen)
 Spektron ist eine Suite kleiner **Offline-Web-Apps** für ein Sachverständigenbüro für Brandschaden-Chemie (Proben, Fotos, Pläne, Abrechnung für Gutachten). Alle Apps laufen nur im Browser (Chrome/Edge) auf einem Büro-Terminal (RDP), arbeiten direkt auf Projektordnern (File System Access API) und laden nichts hoch (CSP \`connect-src 'self'\`). Es gibt keinen Server. Mitarbeiter arbeiten vor Ort nur auf Papier; die Apps sind vor allem Schreibtisch-Werkzeuge. Die Nutzer sind teils wenig technikaffin und schnell überfordert – einfache, geführte Bedienung hat Vorrang vor Funktionsfülle.
 
-Arbeitsablauf pro Projekt: Projektzentrale (Projektdaten, Arbeitszettel) → ① LabelKit → ② FotoKit → ③ PlanKit → ④ BelegKit; SpesenKit läuft getrennt davon.
+Arbeitsablauf pro Projekt: Projektzentrale (Projektdaten, Arbeitszettel) → ① LabelKit → ② FotoKit → ③ ResultKit (Laborergebnisse) → ④ PlanKit → ⑤ BelegKit; SpesenKit läuft getrennt davon.
 
 | Programm | Repository (GitHub) | Aufgabe |
 |---|---|---|
