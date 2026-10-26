@@ -170,7 +170,7 @@ code,.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
 <script>
 'use strict';
 /* ===== Konfiguration ===== */
-const APP_VERSION = '1.2.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
+const APP_VERSION = '1.2.1', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
 const APPS = [
   {k:'projektzentrale', t:'Projektzentrale', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Hub: Projekte, Projektdaten, Arbeitszettel einlesen, Anlagen (Word), Absprung in die Apps'},
   {k:'labelkit',  t:'① LabelKit',  repo:'kaspersebastian83-dot/labelkit',      rolle:'Proben erfassen, Etiketten, Laborübergabe, PN 98, Feldbögen'},
@@ -264,7 +264,9 @@ function formInit() {
   chips($('#c-app'), 'app', APPS, false); chips($('#c-art'), 'art', ARTEN, true);
   chips($('#c-dring'), 'dring', DRING, false); chips($('#c-haeuf'), 'haeuf', HAEUF, false);
   $('#f-kuerzel').value = ls.get('rueckmeldung:kuerzel') || '';
-  try { const e = JSON.parse(ls.get('rueckmeldung:entwurf') || 'null'); if (e) entwurfLaden(e); } catch (x) {}
+  /* Entwurf ohne eigene Eingaben (z. B. aus 1.2.0) darf die Vorbelegung aus dem Link nicht überdecken */
+  const ausLink = ['app', 'version', 'projekt'].some(k => new URLSearchParams(location.search).get(k));
+  try { const e = JSON.parse(ls.get('rueckmeldung:entwurf') || 'null'); if (e && (hatEingabe(e) || !ausLink)) entwurfLaden(e); } catch (x) {}
   document.querySelectorAll('#form input, #form textarea').forEach(el => el.addEventListener('input', () => { clearTimeout(formInit.t); formInit.t = setTimeout(entwurfSpeichern, 400); }));
   $('#f-kuerzel').addEventListener('input', () => ls.set('rueckmeldung:kuerzel', $('#f-kuerzel').value.trim().toUpperCase()));
   window.addEventListener('pagehide', entwurfSpeichern);   // Tab schließen/neu laden verliert nichts
@@ -279,14 +281,19 @@ function formInit() {
   ab.addEventListener('drop', e => { e.preventDefault(); ab.classList.remove('drag'); bilderHinzu([...e.dataTransfer.files]); });
   document.addEventListener('paste', e => {
     if ($('#seite-form').hidden || $('#form').hidden) return;
+    /* Text in einem Textfeld geht vor (Excel legt Text und Bild zugleich in die Zwischenablage) */
+    const t = e.target, textfeld = t && t.matches && t.matches('textarea, input:not([type=radio]):not([type=checkbox]):not([type=file])');
+    if (textfeld && e.clipboardData && e.clipboardData.getData('text/plain')) return;
     const f = [...(e.clipboardData ? e.clipboardData.files : [])].filter(x => x.type.startsWith('image/'));
     if (f.length) { e.preventDefault(); bilderHinzu(f); }
   });
 }
+/* Nur echte Eingaben machen einen Entwurf; Programm/Version/Projekt allein kommen meist aus dem Link der App. */
+const hatEingabe = e => !!e && ['art', 'dring', 'haeuf', 'titel', 'tat', 'was', 'soll'].some(k => String(e[k] || '').trim());
 function entwurfSpeichern() {
   const e = {app: gewaehlt('app'), art: gewaehlt('art'), dring: gewaehlt('dring'), haeuf: gewaehlt('haeuf'),
     titel: $('#f-titel').value, tat: $('#f-tat').value, was: $('#f-was').value, soll: $('#f-soll').value, projekt: $('#f-projekt').value, version: $('#f-version').value};
-  if (Object.values(e).some(v => v)) ls.set('rueckmeldung:entwurf', JSON.stringify(e)); else ls.del('rueckmeldung:entwurf');
+  if (hatEingabe(e)) ls.set('rueckmeldung:entwurf', JSON.stringify(e)); else ls.del('rueckmeldung:entwurf');
 }
 function entwurfLaden(e) {
   for (const n of ['app', 'art', 'dring', 'haeuf']) { const r = document.querySelector(`input[name="${n}"][value="${e[n]}"]`); if (r) r.checked = true; }
@@ -564,7 +571,7 @@ function reiter(welcher) {
 }
 $('#tab-form').onclick = () => reiter('form'); $('#tab-aus').onclick = () => reiter('aus');
 /* Aus einer App geöffnet (…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123): Programm, Version und Projekt
-   vorbelegen – nur leere Felder, ein gespeicherter Entwurf geht vor. Unbekannte Werte werden ignoriert. */
+   vorbelegen – nur leere Felder, ein gespeicherter Entwurf mit eigenen Eingaben geht vor. Unbekannte Werte werden ignoriert. */
 function vorbelegen() {
   const q = new URLSearchParams(location.search), app = q.get('app'), version = q.get('version'), projekt = q.get('projekt');
   if (app && APPS.some(a => a.k === app) && !gewaehlt('app')) { const r = document.querySelector(`input[name="app"][value="${app}"]`); if (r) r.checked = true; }

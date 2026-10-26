@@ -88,6 +88,28 @@ let page;
   await frisch.goto(base + '?app=<b>x</b>&version=9'); await frisch.waitForSelector('#c-app input');
   assert.equal(await frisch.locator('input[name=app]:checked').count(), 0); assert.equal(await frisch.inputValue('#f-version'), '9');
   assert.equal(await frisch.locator('label.chip', {hasText: 'Datenarchiv'}).count(), 1);
+  // 1.2.1: Nur vorbelegte Felder ergeben keinen Entwurf – die nächste App mit eigenem Link wird nicht überdeckt
+  await page.goto(base + '?app=plankit&version=1.37.1&projekt=26.0456'); await page.waitForSelector('#c-app input');
+  assert.equal(await page.locator('input[name=app][value=plankit]').isChecked(), true, 'Link der zweiten App gewinnt');
+  assert.equal(await page.inputValue('#f-version'), '1.37.1'); assert.equal(await page.inputValue('#f-projekt'), '26.0456');
+  assert.equal(await page.evaluate(() => localStorage.getItem('rueckmeldung:entwurf')), null, 'kein Entwurf ohne eigene Eingaben');
+  // alter Entwurf (aus 1.2.0) nur mit Programm/Version/Projekt: der Link gewinnt
+  await page.evaluate(() => localStorage.setItem('rueckmeldung:entwurf', JSON.stringify({app: 'fotokit', art: '', dring: '', haeuf: '', titel: '', tat: '', was: '', soll: '', projekt: '26.0123', version: '1.20.1'})));
+  await page.goto(base + '?app=belegkit&version=2.0.0&projekt=26.0789'); await page.waitForSelector('#c-app input');
+  assert.equal(await page.locator('input[name=app][value=belegkit]').isChecked(), true); assert.equal(await page.inputValue('#f-version'), '2.0.0'); assert.equal(await page.inputValue('#f-projekt'), '26.0789');
+  // Entwurf mit eigenen Eingaben geht weiterhin vor
+  await page.fill('#f-titel', 'Halb fertig'); await page.goto(base + '?app=labelkit&version=3.0.0'); await page.waitForSelector('#c-app input');
+  assert.equal(await page.inputValue('#f-titel'), 'Halb fertig'); assert.equal(await page.locator('input[name=app][value=belegkit]').isChecked(), true); assert.equal(await page.inputValue('#f-version'), '2.0.0');
+  // 1.2.1: Einfügen in ein Textfeld mit Text UND Bild (Excel) fügt den Text ein, ohne Text kommt das Bild in die Ablage
+  const einfuegen = mitText => page.evaluate(async mitText => {
+    const ta = document.querySelector('#f-was'); ta.focus();
+    const c = document.createElement('canvas'); c.width = 4; c.height = 4; const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    const dt = new DataTransfer(); if (mitText) dt.setData('text/plain', 'A1\tB1'); dt.items.add(new File([blob], 'image.png', {type: 'image/png'}));
+    const ev = new ClipboardEvent('paste', {clipboardData: dt, bubbles: true, cancelable: true}); ta.dispatchEvent(ev);
+    await new Promise(r => setTimeout(r, 400)); return {verhindert: ev.defaultPrevented, bilder: document.querySelectorAll('#bilder img').length};
+  }, mitText);
+  assert.deepEqual(await einfuegen(true), {verhindert: false, bilder: 0}, 'Text aus Excel wird nicht verschluckt');
+  assert.deepEqual(await einfuegen(false), {verhindert: true, bilder: 1}, 'reines Bild wird weiter angehängt');
   assert.deepEqual(errors, []);
   console.log('Rückmeldung: Pflichtfelder, Entwurf, Download-Fallback, Ordner+Bild, Auswertung, Filter, KI-Export, KI-Import, CSV bestanden.');
   } finally { await browser.close(); server.close(); }
