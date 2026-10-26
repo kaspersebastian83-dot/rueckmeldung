@@ -117,7 +117,7 @@ code,.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
         <div class="fehler" id="e-kuerzel" hidden></div></fieldset>
       <fieldset><label class="l" for="f-projekt">Projekt (falls zutreffend)</label><input type="text" id="f-projekt" maxlength="60" placeholder="z. B. 26.0123 Köln"></fieldset>
       <fieldset><label class="l" for="f-version">Version des Programms (falls bekannt)</label><input type="text" id="f-version" maxlength="20" placeholder="z. B. 4.30.5">
-        <p class="hinweis">Steht oben in der blauen Leiste; Klick auf die Zahl zeigt Änderungen.</p></fieldset>
+        <p class="hinweis">Wird beim Öffnen aus einer App meist schon eingetragen. Sonst steht sie in der App oben (FotoKit: „⋯ Mehr“).</p></fieldset>
     </div>
     <div class="leiste"><button type="submit" class="btn" id="b-senden">Rückmeldung abschicken</button><span class="hinweis" id="sende-info"></span></div>
   </form>
@@ -170,7 +170,7 @@ code,.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
 <script>
 'use strict';
 /* ===== Konfiguration ===== */
-const APP_VERSION = '1.0.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
+const APP_VERSION = '1.1.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
 const APPS = [
   {k:'projektzentrale', t:'Projektzentrale', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Hub: Projekte, Projektdaten, Arbeitszettel einlesen, Anlagen (Word), Absprung in die Apps'},
   {k:'labelkit',  t:'① LabelKit',  repo:'kaspersebastian83-dot/labelkit',      rolle:'Proben erfassen, Etiketten, Laborübergabe, PN 98, Feldbögen'},
@@ -178,6 +178,9 @@ const APPS = [
   {k:'plankit',   t:'③ PlanKit',   repo:'kaspersebastian83-dot/Probenplan',     rolle:'Probenplan/Grundriss, Ergebniskarte, PDF, Anlage Probenahme (TypeScript/Vite)'},
   {k:'belegkit',  t:'④ BelegKit',  repo:'kaspersebastian83-dot/aufwandkit',     rolle:'Zeiten, km, Spesen, Proben, Berichtsseiten für die Rechnung'},
   {k:'spesenkit', t:'SpesenKit',   repo:'kaspersebastian83-dot/reisekosten-pro', rolle:'Monatliche Spesenabrechnung je Person (TypeScript/Vite)'},
+  {k:'datenarchiv', t:'Datenarchiv', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Messwerte aller Projekte vergleichen (Projektzentrale › archiv/)'},
+  {k:'buero',     t:'Büroübersicht', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Gutachten prüfen, Versand dokumentieren (Projektzentrale › buero/)'},
+  {k:'handbuch',  t:'Handbuch (AidKit)', repo:'kaspersebastian83-dot/aidkit',    rolle:'Abläufe Schritt für Schritt, gemeinsame Regeln, Übungen'},
   {k:'suite',     t:'Mehrere Programme / obere Leiste', repo:'', rolle:'Übergreifend (Leiste „Weiter: …“, Wechsel zwischen Apps, Speicherorte)'},
   {k:'unbekannt', t:'Weiß ich nicht', repo:'', rolle:''}
 ];
@@ -559,8 +562,22 @@ function reiter(welcher) {
   $('#tab-form').setAttribute('aria-selected', String(!aus)); $('#tab-aus').setAttribute('aria-selected', String(aus));
 }
 $('#tab-form').onclick = () => reiter('form'); $('#tab-aus').onclick = () => reiter('aus');
-formInit(); auswertungInit(); speicherortAnzeigen();
-if (location.hash === '#auswertung') reiter('aus');
+/* Aus einer App geöffnet (…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123): Programm, Version und Projekt
+   vorbelegen – nur leere Felder, ein gespeicherter Entwurf geht vor. Unbekannte Werte werden ignoriert. */
+function vorbelegen() {
+  const q = new URLSearchParams(location.search), app = q.get('app'), version = q.get('version'), projekt = q.get('projekt');
+  if (app && APPS.some(a => a.k === app) && !gewaehlt('app')) { const r = document.querySelector(`input[name="app"][value="${app}"]`); if (r) r.checked = true; }
+  if (version && !$('#f-version').value) $('#f-version').value = version.slice(0, 20);
+  if (projekt && !$('#f-projekt').value) $('#f-projekt').value = projekt.slice(0, 60);
+}
+/* Die Auswertung ist für den Betreuer: Reiter nur sichtbar, wenn die Seite mit …/rueckmeldung/#auswertung geöffnet wird. */
+function auswertungSichtbar() {
+  const an = location.hash === '#auswertung';
+  $('#tab-aus').hidden = !an; document.querySelector('header nav').hidden = !an;
+  if (an) reiter('aus'); else if (!$('#seite-aus').hidden) reiter('form');
+}
+window.addEventListener('hashchange', auswertungSichtbar);
+formInit(); vorbelegen(); auswertungInit(); speicherortAnzeigen(); auswertungSichtbar();
 </script>
 </body>
 </html>
