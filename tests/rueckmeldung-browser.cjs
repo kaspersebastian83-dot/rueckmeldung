@@ -19,6 +19,8 @@ let page;
   page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('download', d => downloads.push(d));
   await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
+  // 0. Für Mitarbeiter nur das Formular; die Auswertung erscheint mit #auswertung (1.1.0)
+  assert.equal(await page.locator('header nav').isVisible(), false); assert.equal(await page.locator('#tab-aus').isVisible(), false);
   // 1. Pflichtfelder
   await page.click('#b-senden');
   for (const id of ['e-app', 'e-art', 'e-titel', 'e-was', 'e-kuerzel']) assert.equal(await page.locator('#' + id).isVisible(), true, id);
@@ -44,6 +46,7 @@ let page;
   // eine dritte, abgelehnt-fähige Rückmeldung
   await page.click('#b-neu'); await pick('app','spesenkit'); await pick('art','lob'); await page.fill('#f-titel', 'Monatsabschluss top'); await page.fill('#f-was', 'Ging schnell.'); await page.click('#b-senden'); await page.waitForSelector('#fertig:not([hidden])');
   // 4. Auswertung
+  await page.evaluate(() => { location.hash = 'auswertung'; }); await page.waitForSelector('#tab-aus:not([hidden])');
   await page.click('#tab-aus'); await page.click('#a-laden'); await page.waitForSelector('#a-tbody tr[data-id]');
   assert.equal(await page.locator('#a-tbody tr[data-id]').count(), 2 + 0 + 0 === 2 ? 2 : 2); // PlanKit + SpesenKit im Ordner (die erste liegt im Download)
   assert.match(await page.locator('#a-zaehler').textContent(), /2 von 2 Einträgen · 2 offen/);
@@ -76,6 +79,15 @@ let page;
   await page.click('#tab-form'); await page.click('#b-neu'); await page.screenshot({path: path.join(process.env.SCREENSHOT_DIR || os.tmpdir(), 'rueckmeldung-shot-form.png'), fullPage: true});
   await page.setViewportSize({width: 390, height: 900}); await page.screenshot({path: path.join(process.env.SCREENSHOT_DIR || os.tmpdir(), 'rueckmeldung-shot-form-390.png'), fullPage: true});
   await page.setViewportSize({width: 1280, height: 1000}); await page.click('#tab-aus'); await page.screenshot({path: path.join(process.env.SCREENSHOT_DIR || os.tmpdir(), 'rueckmeldung-shot-aus.png'), fullPage: true});
+  // Aus einer App geöffnet: Programm, Version und Projekt vorbelegt; unbekannte Werte ignoriert (1.1.0)
+  const base = `http://127.0.0.1:${server.address().port}/index.html`;
+  await page.goto(base + '?app=fotokit&version=1.17.1&projekt=26.0999%20Test'); await page.waitForSelector('#c-app input');
+  assert.equal(await page.locator('input[name=app][value=fotokit]').isChecked(), true);
+  assert.equal(await page.inputValue('#f-version'), '1.17.1'); assert.equal(await page.inputValue('#f-projekt'), '26.0999 Test');
+  const frisch = await (await browser.newContext()).newPage();   // eigener Browser-Speicher, kein Entwurf
+  await frisch.goto(base + '?app=<b>x</b>&version=9'); await frisch.waitForSelector('#c-app input');
+  assert.equal(await frisch.locator('input[name=app]:checked').count(), 0); assert.equal(await frisch.inputValue('#f-version'), '9');
+  assert.equal(await frisch.locator('label.chip', {hasText: 'Datenarchiv'}).count(), 1);
   assert.deepEqual(errors, []);
   console.log('Rückmeldung: Pflichtfelder, Entwurf, Download-Fallback, Ordner+Bild, Auswertung, Filter, KI-Export, KI-Import, CSV bestanden.');
   } finally { await browser.close(); server.close(); }
