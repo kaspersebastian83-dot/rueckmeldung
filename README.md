@@ -2,7 +2,7 @@
 
 Formular, in dem Mitarbeiter Fehler, Auffälligkeiten, Verbesserungswünsche und Fragen zu den Büro-Apps der Suite **Spektron** (Projektzentrale, LabelKit, FotoKit, PlanKit, BelegKit, SpesenKit) aufschreiben – und eine Auswertung für den Betreuer, die sich leicht mit einer KI weiterverarbeiten lässt.
 
-**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.1.0**
+**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.2.0**
 (Direkt zur Auswertung: `…/rueckmeldung/#auswertung` – nur so erscheint der Reiter „Auswertung (Betreuer)“; Mitarbeiter sehen nur das Formular.)
 
 Übersicht der Suite: [README der Projektzentrale](https://github.com/kaspersebastian83-dot/Projektzentrale#readme).

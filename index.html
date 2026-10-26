@@ -170,13 +170,14 @@ code,.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
 <script>
 'use strict';
 /* ===== Konfiguration ===== */
-const APP_VERSION = '1.1.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
+const APP_VERSION = '1.2.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
 const APPS = [
   {k:'projektzentrale', t:'Projektzentrale', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Hub: Projekte, Projektdaten, Arbeitszettel einlesen, Anlagen (Word), Absprung in die Apps'},
   {k:'labelkit',  t:'① LabelKit',  repo:'kaspersebastian83-dot/labelkit',      rolle:'Proben erfassen, Etiketten, Laborübergabe, PN 98, Feldbögen'},
   {k:'fotokit',   t:'② FotoKit',   repo:'kaspersebastian83-dot/Bildumbenenner', rolle:'Fotos beschreiben/umbenennen, Bilddokumentation (PDF), Ergebnistabelle'},
-  {k:'plankit',   t:'③ PlanKit',   repo:'kaspersebastian83-dot/Probenplan',     rolle:'Probenplan/Grundriss, Ergebniskarte, PDF, Anlage Probenahme (TypeScript/Vite)'},
-  {k:'belegkit',  t:'④ BelegKit',  repo:'kaspersebastian83-dot/aufwandkit',     rolle:'Zeiten, km, Spesen, Proben, Berichtsseiten für die Rechnung'},
+  {k:'resultkit', t:'③ ResultKit', repo:'kaspersebastian83-dot/resultkit',      rolle:'Laborergebnisse: Laborauftrag gegen Prüfberichte, Import, „Ergebnisse übernehmen“ (TypeScript/Vite)'},
+  {k:'plankit',   t:'④ PlanKit',   repo:'kaspersebastian83-dot/Probenplan',     rolle:'Probenplan/Grundriss, Ergebniskarte, PDF, Anlage Probenahme (TypeScript/Vite)'},
+  {k:'belegkit',  t:'⑤ BelegKit',  repo:'kaspersebastian83-dot/aufwandkit',     rolle:'Zeiten, km, Spesen, Proben, Berichtsseiten für die Rechnung'},
   {k:'spesenkit', t:'SpesenKit',   repo:'kaspersebastian83-dot/reisekosten-pro', rolle:'Monatliche Spesenabrechnung je Person (TypeScript/Vite)'},
   {k:'datenarchiv', t:'Datenarchiv', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Messwerte aller Projekte vergleichen (Projektzentrale › archiv/)'},
   {k:'buero',     t:'Büroübersicht', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Gutachten prüfen, Versand dokumentieren (Projektzentrale › buero/)'},
