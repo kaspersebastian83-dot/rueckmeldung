@@ -2,7 +2,7 @@
 
 Formular, in dem Mitarbeiter Fehler, Auffälligkeiten, Verbesserungswünsche und Fragen zu den Büro-Apps der Suite **Spektron** (Projektzentrale, LabelKit, FotoKit, PlanKit, BelegKit, SpesenKit) aufschreiben – und eine Auswertung für den Betreuer, die sich leicht mit einer KI weiterverarbeiten lässt.
 
-**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.2.1**
+**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.3.0**
 (Direkt zur Auswertung: `…/rueckmeldung/#auswertung` – nur so erscheint der Reiter „Auswertung (Betreuer)“; Mitarbeiter sehen nur das Formular.)
 
 Übersicht der Suite: [README der Projektzentrale](https://github.com/kaspersebastian83-dot/Projektzentrale#readme).
@@ -13,7 +13,7 @@ Die App läuft vollständig im Browser. **Rückmeldungen und Bilder werden nicht
 
 ## Für Mitarbeiter („Rückmeldung schreiben“)
 
-Verlinkt aus der Projektzentrale („Weitere Apps“), dem Handbuch und SpesenKit. Die Apps übergeben, was sie wissen: `…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123` belegt Programm, Version und Projekt vor (nur leere Felder; ein gespeicherter Entwurf mit eigenen Eingaben geht vor, ein Entwurf nur aus Programm/Version/Projekt nicht; unbekannte Programme werden ignoriert). Programme: `projektzentrale`, `labelkit`, `fotokit`, `resultkit`, `plankit`, `belegkit`, `spesenkit`, `datenarchiv`, `buero`, `handbuch`, `suite`, `unbekannt`.
+Verlinkt aus der Projektzentrale („Weitere Apps“), dem Handbuch und SpesenKit. Die Apps übergeben, was sie wissen: `…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123` belegt Programm, Version und Projekt vor (nur leere Felder; ein gespeicherter Entwurf mit eigenen Eingaben geht vor, ein Entwurf nur aus Programm/Version/Projekt nicht; unbekannte Programme werden ignoriert). Programme: `projektzentrale`, `labelkit`, `fotokit`, `resultkit`, `plankit`, `belegkit`, `spesenkit`, `datenarchiv`, `buerokit`, `buero`, `handbuch`, `suite`, `unbekannt`.
 
 1. Programm wählen, dann „Was ist es?“ (Fehler / Auffälligkeit / Verbesserungswunsch / Unklar / Hat gut geklappt).
 2. Ein Satz, worum es geht, und was passiert ist oder stört. Optional: was man tun wollte, was man erwartet hat, wie sehr es stört, wie oft, Projekt, Version.

@@ -170,7 +170,7 @@ code,.mono{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
 <script>
 'use strict';
 /* ===== Konfiguration ===== */
-const APP_VERSION = '1.2.1', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
+const APP_VERSION = '1.3.0', FORMAT = 'spektron-rueckmeldung', FORMAT_VERSION = 1;
 const APPS = [
   {k:'projektzentrale', t:'Projektzentrale', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Hub: Projekte, Projektdaten, Arbeitszettel einlesen, Anlagen (Word), Absprung in die Apps'},
   {k:'labelkit',  t:'① LabelKit',  repo:'kaspersebastian83-dot/labelkit',      rolle:'Proben erfassen, Etiketten, Laborübergabe, PN 98, Feldbögen'},
@@ -180,7 +180,8 @@ const APPS = [
   {k:'belegkit',  t:'⑤ BelegKit',  repo:'kaspersebastian83-dot/aufwandkit',     rolle:'Zeiten, km, Spesen, Proben, Berichtsseiten für die Rechnung'},
   {k:'spesenkit', t:'SpesenKit',   repo:'kaspersebastian83-dot/reisekosten-pro', rolle:'Monatliche Spesenabrechnung je Person (TypeScript/Vite)'},
   {k:'datenarchiv', t:'Datenarchiv', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Messwerte aller Projekte vergleichen (Projektzentrale › archiv/)'},
-  {k:'buero',     t:'Büroübersicht', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'Gutachten prüfen, Versand dokumentieren (Projektzentrale › buero/)'},
+  {k:'buerokit',  t:'BüroKit', repo:'kaspersebastian83-dot/buerokit',      rolle:'Tagesliste des Büros: Gutachten gegenlesen, PDF, Versand, eigene Aufgaben (eigene App)'},
+  {k:'buero',     t:'Büroübersicht (alt)', repo:'kaspersebastian83-dot/Projektzentrale', rolle:'frühere Büroübersicht der Projektzentrale – ersetzt durch BüroKit'},
   {k:'handbuch',  t:'Handbuch (AidKit)', repo:'kaspersebastian83-dot/aidkit',    rolle:'Abläufe Schritt für Schritt, gemeinsame Regeln, Übungen'},
   {k:'suite',     t:'Mehrere Programme / obere Leiste', repo:'', rolle:'Übergreifend (Leiste „Weiter: …“, Wechsel zwischen Apps, Speicherorte)'},
   {k:'unbekannt', t:'Weiß ich nicht', repo:'', rolle:''}
