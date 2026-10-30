@@ -95,6 +95,8 @@ let page;
   assert.equal(await page.evaluate(() => localStorage.getItem('rueckmeldung:entwurf')), null, 'kein Entwurf ohne eigene Eingaben');
   // alter Entwurf (aus 1.2.0) nur mit Programm/Version/Projekt: der Link gewinnt
   await page.evaluate(() => localStorage.setItem('rueckmeldung:entwurf', JSON.stringify({app: 'fotokit', art: '', dring: '', haeuf: '', titel: '', tat: '', was: '', soll: '', projekt: '26.0123', version: '1.20.1'})));
+  await page.goto(base + '?app=berichtkit&version=1.1.0&projekt=26.0790'); await page.waitForSelector('#c-app input');
+  assert.equal(await page.locator('input[name=app][value=berichtkit]').isChecked(), true, 'BerichtKit aus der Spektron-Leiste vorgewählt');
   await page.goto(base + '?app=belegkit&version=2.0.0&projekt=26.0789'); await page.waitForSelector('#c-app input');
   assert.equal(await page.locator('input[name=app][value=belegkit]').isChecked(), true); assert.equal(await page.inputValue('#f-version'), '2.0.0'); assert.equal(await page.inputValue('#f-projekt'), '26.0789');
   // Entwurf mit eigenen Eingaben geht weiterhin vor
