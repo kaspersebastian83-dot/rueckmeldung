@@ -582,7 +582,7 @@ function vorbelegen() {
 }
 /* Die Auswertung ist für alle da: Reiter immer sichtbar. Mit …/rueckmeldung/#auswertung öffnet sie sich direkt (Lesezeichen). */
 function auswertungSichtbar() {
-  if (location.hash === '#auswertung') reiter('aus');
+  reiter(location.hash === '#auswertung' ? 'aus' : 'form');   // auch beim Zurück-Knopf: Anzeige folgt der Adresse
 }
 window.addEventListener('hashchange', auswertungSichtbar);
 formInit(); vorbelegen(); auswertungInit(); speicherortAnzeigen(); auswertungSichtbar();
