@@ -19,8 +19,8 @@ let page;
   page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('download', d => downloads.push(d));
   await page.goto(`http://127.0.0.1:${server.address().port}/index.html`);
-  // 0. Für Mitarbeiter nur das Formular; die Auswertung erscheint mit #auswertung (1.1.0)
-  assert.equal(await page.locator('header nav').isVisible(), false); assert.equal(await page.locator('#tab-aus').isVisible(), false);
+  // 0. Der Reiter „Auswertung“ ist immer sichtbar (1.4.0), das Formular ist zuerst offen
+  assert.equal(await page.locator('header nav').isVisible(), true); assert.equal(await page.locator('#tab-aus').isVisible(), true); assert.equal(await page.locator('#seite-form').isVisible(), true); assert.equal(await page.locator('#seite-aus').isVisible(), false);
   // 1. Pflichtfelder
   await page.click('#b-senden');
   for (const id of ['e-app', 'e-art', 'e-titel', 'e-was', 'e-kuerzel']) assert.equal(await page.locator('#' + id).isVisible(), true, id);

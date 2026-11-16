@@ -2,8 +2,8 @@
 
 Formular, in dem Mitarbeiter Fehler, Auffälligkeiten, Verbesserungswünsche und Fragen zu den Büro-Apps der Suite **Spektron** (Projektzentrale, LabelKit, FotoKit, ResultKit, PlanKit, BerichtKit, BelegKit, SpesenKit) aufschreiben – und eine Auswertung für den Betreuer, die sich leicht mit einer KI weiterverarbeiten lässt.
 
-**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.3.1**
-(Direkt zur Auswertung: `…/rueckmeldung/#auswertung` – nur so erscheint der Reiter „Auswertung (Betreuer)“; Mitarbeiter sehen nur das Formular.)
+**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.4.0**
+(Der Reiter „Auswertung“ ist für alle sichtbar. Direkt dorthin: `…/rueckmeldung/#auswertung`.)
 
 Übersicht der Suite: [README der Projektzentrale](https://github.com/kaspersebastian83-dot/Projektzentrale#readme).
 
@@ -29,9 +29,9 @@ Gespeichert wird ein Eintrag als `R-<JJJJMMTT>-<HHMMSS>-<Kürzel>.json` (plus `�
 
 Nach einem Browserneustart fragt der Browser einmal nach „Zugriff erlauben“.
 
-## Auswertung (Betreuer)
+## Auswertung
 
-Reiter „Auswertung (Betreuer)“ → „Rückmeldungen laden“. Filter nach Status, Programm, Art und Stichwort; ein Klick auf eine Zeile zeigt alle Angaben samt Bildern. Status, Priorität, Gruppe und Notiz werden direkt an der Datei gespeichert (frisch lesen → nur `bearbeitung` ändern → schreiben; die Angaben der Mitarbeiter bleiben unberührt).
+Reiter „Auswertung“ → „Rückmeldungen laden“. Filter nach Status, Programm, Art und Stichwort; ein Klick auf eine Zeile zeigt alle Angaben samt Bildern. Status, Priorität, Gruppe und Notiz werden direkt an der Datei gespeichert (frisch lesen → nur `bearbeitung` ändern → schreiben; die Angaben der Mitarbeiter bleiben unberührt).
 
 Status: `neu`, `rueckfrage` (Rückfrage an den Mitarbeiter), `in-arbeit`, `erledigt`, `abgelehnt`.
 
