@@ -1,8 +1,8 @@
 # Rückmeldung (Spektron)
 
-Formular, in dem Mitarbeiter Fehler, Auffälligkeiten, Verbesserungswünsche und Fragen zu den Büro-Apps der Suite **Spektron** (Projektzentrale, LabelKit, FotoKit, ResultKit, PlanKit, BerichtKit, BelegKit, SpesenKit) aufschreiben – und eine Auswertung für den Betreuer, die sich leicht mit einer KI weiterverarbeiten lässt.
+Formular, in dem Mitarbeiter Fehler, Auffälligkeiten, Verbesserungswünsche und Fragen zu den Büro-Apps der Suite **Spektron** (Projektzentrale, LabelKit, FotoKit, ResultKit, PlanKit, BerichtKit, LexiKit, LektorKit, GlasKit, BelegKit, SpesenKit, BüroKit, TeamKit) aufschreiben – und eine Auswertung für den Betreuer, die sich leicht mit einer KI weiterverarbeiten lässt.
 
-**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.4.0**
+**App öffnen:** https://kaspersebastian83-dot.github.io/rueckmeldung/ · aktuelle Version **1.5.0**
 (Der Reiter „Auswertung“ ist für alle sichtbar. Direkt dorthin: `…/rueckmeldung/#auswertung`.)
 
 Übersicht der Suite: [README der Projektzentrale](https://github.com/kaspersebastian83-dot/Projektzentrale#readme).
@@ -11,9 +11,13 @@ Formular, in dem Mitarbeiter Fehler, Auffälligkeiten, Verbesserungswünsche und
 
 Die App läuft vollständig im Browser. **Rückmeldungen und Bilder werden nicht hochgeladen** – GitHub liefert nur den Programmcode (Content Security Policy mit `connect-src 'self'`). Gespeichert wird in einem Ordner auf dem Büro-Laufwerk.
 
+## Neu in 1.5.0 (20.11.2026, Audit Lauf 3, C15)
+
+TeamKit, LexiKit, LektorKit und GlasKit stehen in der Programmliste (und mit Repository in der KI-Übergabe); `?app=teamkit` usw. wählt sie vor. Vorher landeten Rückmeldungen zu diesen Apps unter „Weiß ich nicht“.
+
 ## Für Mitarbeiter („Rückmeldung schreiben“)
 
-Verlinkt aus der Projektzentrale („Weitere Apps“), dem Handbuch und SpesenKit. Die Apps übergeben, was sie wissen: `…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123` belegt Programm, Version und Projekt vor (nur leere Felder; ein gespeicherter Entwurf mit eigenen Eingaben geht vor, ein Entwurf nur aus Programm/Version/Projekt nicht; unbekannte Programme werden ignoriert). Programme: `projektzentrale`, `labelkit`, `fotokit`, `resultkit`, `plankit`, `belegkit`, `spesenkit`, `datenarchiv`, `buerokit`, `buero`, `handbuch`, `suite`, `unbekannt`.
+Verlinkt aus der Projektzentrale („Weitere Apps“), dem Handbuch und SpesenKit. Die Apps übergeben, was sie wissen: `…/rueckmeldung/?app=fotokit&version=1.17.1&projekt=26.0123` belegt Programm, Version und Projekt vor (nur leere Felder; ein gespeicherter Entwurf mit eigenen Eingaben geht vor, ein Entwurf nur aus Programm/Version/Projekt nicht; unbekannte Programme werden ignoriert). Programme: `projektzentrale`, `labelkit`, `fotokit`, `resultkit`, `plankit`, `berichtkit`, `lexikit`, `lektorkit`, `glaskit`, `belegkit`, `spesenkit`, `datenarchiv`, `buerokit`, `teamkit`, `buero`, `handbuch`, `suite`, `unbekannt`. FinanzKit verlinkt bewusst **nicht** hierher: Rückmeldungen liegen im Archivordner und sind für alle im Büro lesbar – Probleme in FinanzKit gehen direkt an Basti, ohne Zahlen und Screenshots (Audit Lauf 3, C14).
 
 1. Programm wählen, dann „Was ist es?“ (Fehler / Auffälligkeit / Verbesserungswunsch / Unklar / Hat gut geklappt).
 2. Ein Satz, worum es geht, und was passiert ist oder stört. Optional: was man tun wollte, was man erwartet hat, wie sehr es stört, wie oft, Projekt, Version.
