@@ -99,6 +99,13 @@ let page;
   assert.equal(await page.locator('input[name=app][value=berichtkit]').isChecked(), true, 'BerichtKit aus der Spektron-Leiste vorgewählt');
   await page.goto(base + '?app=belegkit&version=2.0.0&projekt=26.0789'); await page.waitForSelector('#c-app input');
   assert.equal(await page.locator('input[name=app][value=belegkit]').isChecked(), true); assert.equal(await page.inputValue('#f-version'), '2.0.0'); assert.equal(await page.inputValue('#f-projekt'), '26.0789');
+  // 1.5.0 (C15): jede Kennung, die eine Spektron-App sendet, steht in der Liste; FinanzKit bewusst nicht (C14)
+  for (const k of ['projektzentrale', 'labelkit', 'fotokit', 'resultkit', 'plankit', 'berichtkit', 'lexikit', 'lektorkit', 'glaskit', 'belegkit', 'spesenkit', 'datenarchiv', 'buerokit', 'teamkit', 'handbuch'])
+    assert.equal(await page.locator(`input[name=app][value=${k}]`).count(), 1, 'fehlt in der Programmliste: ' + k);
+  assert.equal(await page.locator('input[name=app][value=finanzkit]').count(), 0, 'FinanzKit gehört nicht in die Liste (C14)');
+  const tk = await (await browser.newContext()).newPage();
+  await tk.goto(base + '?app=teamkit&version=0.5.1'); await tk.waitForSelector('#c-app input');
+  assert.equal(await tk.locator('input[name=app][value=teamkit]').isChecked(), true, 'TeamKit aus dem Link vorgewählt');
   // Entwurf mit eigenen Eingaben geht weiterhin vor
   await page.fill('#f-titel', 'Halb fertig'); await page.goto(base + '?app=labelkit&version=3.0.0'); await page.waitForSelector('#c-app input');
   assert.equal(await page.inputValue('#f-titel'), 'Halb fertig'); assert.equal(await page.locator('input[name=app][value=belegkit]').isChecked(), true); assert.equal(await page.inputValue('#f-version'), '2.0.0');
