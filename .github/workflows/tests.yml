@@ -1,6 +1,8 @@
 name: Automated tests
 
 on:
+  schedule:
+    - cron: '31 5 * * *'  # UTC
   pull_request:
   push:
     branches: [main]
